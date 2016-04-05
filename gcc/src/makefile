@@ -9,10 +9,10 @@ OBJECTS = $(shell ls ${SOURCES}*.cpp | sed "s/.cpp/.o/g" | sed "s/src/bin/g")
 DEBUG = -g
 MIC = -mmic -O2
 VECTORIZED =  -qopt-report5  -fstrict-aliasing -qopt-report-phase=vec -vec-threshold0
-OPTIONS = -Wall -Wno-deprecated -Wno-non-virtual-dtor -lm -I${INCLUDES}  -std=c++11
+OPTIONS = -Wall -Wno-deprecated -Wno-non-virtual-dtor -lm -I${INCLUDES}  -std=c++11 -g
 
 #CXX = /opt/intel/bin/icc
-CXX = g++ 
+CXX = g++
 
 ${BINARIES}foudre: $(OBJECTS)
 	$(CXX) $(OBJECTS) -o ${BINARIES}foudre -lpthread $(OPTIONS)
