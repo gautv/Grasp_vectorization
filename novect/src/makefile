@@ -11,7 +11,7 @@ MIC = -mmic -O2 -no-vec
 VECTORIZED =  -qopt-report5  -fstrict-aliasing -qopt-report-phase=vec -vec-threshold0
 OPTIONS = -Wall -Wno-deprecated -Wno-non-virtual-dtor -lm -I${INCLUDES}   ${MIC} -std=c++11
 
-CXX = /opt/intel/bin/icc -openmp -mmic -Wall -Wno-deprecated -Wno-non-virtual-dtor -O2 -no-vec -I${INCLUDES} -std=c++11
+CXX = /opt/intel/bin/icc -openmp -mmic -Wall -Wno-deprecated -Wno-non-virtual-dtor -O2 -qopt-report6 -no-vec -I${INCLUDES} -std=c++11
 
 #CXX = g++
 
