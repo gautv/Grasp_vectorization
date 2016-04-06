@@ -1,3 +1,5 @@
+./copy.sh
+
 cd ./novect/src/
 
 echo '--- Compiling not vectorized function ---'

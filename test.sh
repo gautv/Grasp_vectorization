@@ -1,19 +1,19 @@
 echo "========= Original Version ========="
 echo "novect================="
-cd ./novect/src
-time ../bin/foudre $1 $2 $3 0 $5
+cd ./novect
+time ./bin/foudre 0 $1 
 cd -
 echo "vect==================="
-cd ./vect/src
-time ../bin/foudre $1 $2 $3 0 $5
+cd ./vect
+time ./bin/foudre 0 $1
 cd -
 
 echo "========= Vectorized Version ========="
 echo "novect================="
-cd ./novect/src
-time ../bin/foudre $1 $2 $3 1 $5
+cd ./novect
+time ./bin/foudre 1 $1
 cd -
 echo "vect==================="
-cd ./vect/src
-time ../bin/foudre $1 $2 $3 1 $5
+cd ./vect
+time ./bin/foudre 1 $1
 cd -
