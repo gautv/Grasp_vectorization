@@ -18,8 +18,8 @@ static const integer M1 = M + 1;
 static const integer SIZE = 64 * 4;
 
 //================Functions==========================//
-integer classic_cost(integer processing_time0[SIZE][SIZE]);
-integer new_cost(integer processing_time1[SIZE][SIZE]);
+integer classic_cost(integer permutation[SIZE],integer processing_time0[SIZE][SIZE]);
+integer new_cost(integer permutation[SIZE],integer processing_time1[SIZE][SIZE]);
 
 
 #endif /* COST_H */
