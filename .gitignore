@@ -4,4 +4,4 @@
 
 novect/bin*
 vect/bin*
-src/bin*
+gcc/bin*
