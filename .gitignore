@@ -1,0 +1,7 @@
+**/*.o
+**/*.d
+**/*.optrpt
+
+novect/bin*
+vect/bin*
+src/bin*
