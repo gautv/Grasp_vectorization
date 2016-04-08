@@ -2,6 +2,7 @@
 #define COST_H
 
 #include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
 
@@ -9,8 +10,8 @@
 
 using integer = unsigned short;
 
-static const integer J = 100;
-static const integer M =20;
+static const integer J = 3;
+static const integer M = 1;
 
 static const integer J1 = J + 2*(M - 1);
 static const integer M1 = M + 1;
