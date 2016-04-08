@@ -7,19 +7,19 @@
 
 //=============Definitions==========================//
 
-using integer = uint16_t;
+using integer = unsigned short;
 
-static const integer J = 50;
-static const integer M = 20;
+static const integer J = 100;
+static const integer M =20;
 
 static const integer J1 = J + 2*(M - 1);
 static const integer M1 = M + 1;
 
-static const integer SIZE = 64 * 4;
+static const integer SIZE = 64 * 10;
 
 //================Functions==========================//
-integer classic_cost(integer processing_time0[SIZE][SIZE]);
-integer new_cost(integer processing_time1[SIZE][SIZE]);
+integer classic_cost(integer permutation[SIZE],integer processing_time0[SIZE][SIZE]);
+integer new_cost(integer permutation[SIZE],integer processing_time1[SIZE][SIZE]);
 
 
 #endif /* COST_H */
