@@ -9,7 +9,7 @@
 
 using integer = uint16_t;
 
-static const integer J = 100;
+static const integer J = 50;
 static const integer M = 20;
 
 static const integer J1 = J + 2*(M - 1);
