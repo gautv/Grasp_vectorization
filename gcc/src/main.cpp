@@ -1,5 +1,17 @@
 #include "../include/cost.h"
 
+void swap(integer *permutation, integer i, integer j) {
+  auto tmp = permutation[i];
+  permutation[i] = permutation[j];
+  permutation[j] = tmp;
+}
+
+void swap_columns(int **instance, int col_i, int col_j) {
+  auto tmp = instance[col_i];
+  instance[col_i] = instance[col_j];
+  instance[col_j] = tmp;
+}
+
 int main(int argc, char **argv) {
 
   // Getting arguments ...
@@ -11,12 +23,8 @@ int main(int argc, char **argv) {
   integer permutation0[SIZE] __attribute__((aligned(64)));
   integer permutation1[SIZE] __attribute__((aligned(64)));
 
-  // for (integer j = 0; j < J; j++)
-  //  permutation0[j] = j;
-
-  permutation0[0] = 0;
-  permutation0[1] = 1;
-  permutation0[2] = 2;
+  for (integer j = 0; j < J; j++)
+    permutation0[j] = j;
 
   for (integer j = 0; j < J1; ++j) {
     if (j < (M - 1) || j >= J + (M - 1))
@@ -32,7 +40,7 @@ int main(int argc, char **argv) {
 
   for (integer j = 0; j < J; j++)
     for (integer m = 0; m < M; m++)
-      processingTime0[m][j] = m + j;
+      processingTime0[m][j] = m + j * j - j * m;
 
   for (integer j = M - 1; j < J + (M - 1); j++) {
     for (integer m = 1; m < M1; m++) {
@@ -56,13 +64,17 @@ int main(int argc, char **argv) {
         for (integer j2 = 0; j2 < J; j2++) // OPTIMIZATION : i2 < i1 ????
         {
           // Generation Neighbour
-          std::swap(permutation0[j1], permutation0[j2]);
+          swap(permutation0, j1, j2);
 
           // Computation of the cost
-          integer current_cost = classic_cost(permutation0,processingTime0);
+          integer current_cost = classic_cost(permutation0, processingTime0);
+          printf("\n%d %d %d %d\t", min_cost, current_cost, j1, j2);
+
+          for (int i = 0; i < J; i++)
+            printf("%d ", permutation0[i]);
 
           // Go back to the Original Permutation
-          std::swap(permutation0[j1], permutation0[j2]);
+          swap(permutation0, j1, j2);
 
           if (current_cost < min_cost) {
             min_cost = current_cost;
@@ -72,10 +84,9 @@ int main(int argc, char **argv) {
         }
       has_found_better_minimum = (min_cost < before_cost);
     }
-    printf("min j1 = %d\tmin j2=%d\tmin cost = %d\n",min_j1,min_j2,min_cost);
+    printf("\n\nmin j1 = %d\tmin j2=%d\tmin cost = %d\n", min_j1, min_j2,
+           min_cost);
   }
-
 
   return 0;
 }
-
