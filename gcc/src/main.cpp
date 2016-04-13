@@ -1,22 +1,104 @@
 #include "../include/cost.h"
 
-void swap(integer *permutation, integer i, integer j) {
+integer J, M;
+integer J1, M1;
+integer M2;
+
+void swap(integer permutation[SIZE], integer i, integer j) {
   auto tmp = permutation[i];
   permutation[i] = permutation[j];
   permutation[j] = tmp;
 }
 
-void swap_columns(int **instance, int col_i, int col_j) {
-  auto tmp = instance[col_i];
-  instance[col_i] = instance[col_j];
-  instance[col_j] = tmp;
+void swap_columns(integer instance[SIZE][SIZE], integer i, integer j) {
+  for (integer m = 0; m < M2; m++) {
+    auto tmp = instance[m][i];
+    instance[m][i] = instance[m][j];
+    instance[m][j] = tmp;
+  }
+}
+
+integer classical_local_search(integer permutation[SIZE],
+                               integer processingTime0[SIZE][SIZE],
+                               integer &min_j1, integer &min_j2) {
+  int min_cost = 999999999; // minimum cost = + infinity (at first)
+  bool has_found_better_minimum = true;
+
+  while (has_found_better_minimum) {
+
+    integer before_cost = min_cost;
+
+    // Iteration through each elements (Permutation in O(N^2))
+    for (integer j1 = 0; j1 < J; j1++)
+      for (integer j2 = 0; j2 < J; j2++) // OPTIMIZATION : i2 < i1 ????
+      {
+        // Generation Neighbour
+        swap(permutation, j1, j2);
+
+        // Computation of the cost
+        integer current_cost = classic_cost(permutation, processingTime0);
+
+        // Go back to the Original Permutation
+        swap(permutation, j1, j2);
+
+        if (current_cost < min_cost) {
+          min_cost = current_cost;
+          min_j1 = j1;
+          min_j2 = j2;
+        }
+      }
+    has_found_better_minimum = (min_cost < before_cost);
+  }
+  return min_cost;
+}
+
+integer new_local_search(integer processingTime1[SIZE][SIZE], integer &min_j1,
+                         integer &min_j2) {
+  int min_cost = 999999999; // minimum cost = + infinity (at first)
+  bool has_found_better_minimum = true;
+
+  while (has_found_better_minimum) {
+
+    integer before_cost = min_cost;
+
+    // Iteration through each elements (Permutation in O(N^2))
+    for (integer j1 = M - 1; j1 < J + (M - 1); j1++)
+      for (integer j2 = M - 1; j2 < J + (M - 1);
+           j2++) // OPTIMIZATION : i2 < i1 ????
+      {
+        // Generation Neighbour
+        swap_columns(processingTime1, j1, j2);
+
+        // Computation of the cost
+        integer current_cost = new_cost(processingTime1);
+
+        // Go back to the Original Permutation
+        swap_columns(processingTime1, j1, j2);
+
+        if (current_cost < min_cost) {
+          min_cost = current_cost;
+          min_j1 = j1;
+          min_j2 = j2;
+        }
+      }
+    has_found_better_minimum = (min_cost < before_cost);
+  }
+
+  return min_cost;
 }
 
 int main(int argc, char **argv) {
 
   // Getting arguments ...
-  int isVectorized = atoi(argv[1]);
-  int numberIterations = atoi(argv[2]);
+  J = atoi(argv[1]);
+  M = atoi(argv[2]);
+
+  J1 = J + 2 * (M - 1);
+  M1 = M + 1;
+  M2 = M1 + 1;
+
+  int isVectorized = atoi(argv[3]);
+  int numberIterations = atoi(argv[4]);
 
   //--- GENERATE INITIAL SOLUTION + PERMUTATION FROM OTHER INSTANCE ---
 
@@ -40,7 +122,7 @@ int main(int argc, char **argv) {
 
   for (integer j = 0; j < J; j++)
     for (integer m = 0; m < M; m++)
-      processingTime0[m][j] = m + j * j - j * m;
+      processingTime0[m][j] = rand() % 64;
 
   for (integer j = M - 1; j < J + (M - 1); j++) {
     for (integer m = 1; m < M1; m++) {
@@ -48,44 +130,27 @@ int main(int argc, char **argv) {
     }
   }
 
+  for (integer j = 0; j < J1; j++) {
+    processingTime1[M1][j] = permutation1[j];
+  }
+
   //--- LOCAL SEARCH ---
-  {
-    int min_cost = 999999999; // minimum cost = + infinity (at first)
-    integer min_j1 = -1;
-    integer min_j2 = -1;
-    bool has_found_better_minimum = true;
+  integer min_j1;
+  integer min_j2;
+  for (int i = 0; i < numberIterations; i++) {
+    min_j1 = -1;
+    min_j2 = -1;
+    auto cost = new_local_search(processingTime1, min_j1, min_j2);
+    printf("cost = %d j1 = %d j2=%d\n", cost, min_j1 - (M - 1),
+           min_j2 - (M - 1));
+  }
 
-    while (has_found_better_minimum) {
-
-      integer before_cost = min_cost;
-
-      // Iteration through each elements (Permutation in O(N^2))
-      for (integer j1 = 0; j1 < J; j1++)
-        for (integer j2 = 0; j2 < J; j2++) // OPTIMIZATION : i2 < i1 ????
-        {
-          // Generation Neighbour
-          swap(permutation0, j1, j2);
-
-          // Computation of the cost
-          integer current_cost = classic_cost(permutation0, processingTime0);
-          printf("\n%d %d %d %d\t", min_cost, current_cost, j1, j2);
-
-          for (int i = 0; i < J; i++)
-            printf("%d ", permutation0[i]);
-
-          // Go back to the Original Permutation
-          swap(permutation0, j1, j2);
-
-          if (current_cost < min_cost) {
-            min_cost = current_cost;
-            min_j1 = j1;
-            min_j2 = j2;
-          }
-        }
-      has_found_better_minimum = (min_cost < before_cost);
-    }
-    printf("\n\nmin j1 = %d\tmin j2=%d\tmin cost = %d\n", min_j1, min_j2,
-           min_cost);
+  for (int i = 0; i < numberIterations; i++) {
+    min_j1 = -1;
+    min_j2 = -1;
+    auto cost =
+        classical_local_search(permutation0, processingTime0, min_j1, min_j2);
+    printf("cost = %d j1 = %d j2=%d\n", cost, min_j1, min_j2);
   }
 
   return 0;
