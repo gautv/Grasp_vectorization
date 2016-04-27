@@ -1,8 +1,11 @@
 #include "../include/cost.h"
+#include "../include/instance.h"
 
 integer J, M;
 integer J1, M1;
 integer M2;
+
+clock_t cost_time;
 
 void swap(integer permutation[SIZE], integer i, integer j) {
   auto tmp = permutation[i];
@@ -36,7 +39,10 @@ integer classical_local_search(integer permutation[SIZE],
         swap(permutation, j1, j2);
 
         // Computation of the cost
+        auto start_cost = clock();
         integer current_cost = classic_cost(permutation, processingTime0);
+        auto end_cost = clock();
+        cost_time += (end_cost - start_cost);
 
         // Go back to the Original Permutation
         swap(permutation, j1, j2);
@@ -70,7 +76,10 @@ integer new_local_search(integer processingTime1[SIZE][SIZE], integer &min_j1,
         swap_columns(processingTime1, j1, j2);
 
         // Computation of the cost
+        auto start_cost = clock();
         integer current_cost = new_cost(processingTime1);
+        auto end_cost = clock();
+        cost_time += (end_cost - start_cost);
 
         // Go back to the Original Permutation
         swap_columns(processingTime1, j1, j2);
@@ -89,16 +98,32 @@ integer new_local_search(integer processingTime1[SIZE][SIZE], integer &min_j1,
 
 int main(int argc, char **argv) {
 
+  auto start_main = clock();
+
   // Getting arguments ...
   J = atoi(argv[1]);
   M = atoi(argv[2]);
+  int instance_ID = atoi(argv[3]);
+
+  int isVectorized = atoi(argv[4]);
+  int numberIterations = atoi(argv[5]);
+
+  int aaaa = instance_ID == (-1) ? 20 : instance_ID;
+
+  instance _instance(aaaa);
+
+  if (instance_ID != -1) {
+    *(_instance.data) >> J;
+    *(_instance.data) >> M;
+  } else {
+    int trash;
+    *(_instance.data) >> trash;
+    *(_instance.data) >> trash;
+  }
 
   J1 = J + 2 * (M - 1);
   M1 = M + 1;
   M2 = M1 + 1;
-
-  int isVectorized = atoi(argv[3]);
-  int numberIterations = atoi(argv[4]);
 
   //--- GENERATE INITIAL SOLUTION + PERMUTATION FROM OTHER INSTANCE ---
 
@@ -120,9 +145,17 @@ int main(int argc, char **argv) {
   integer processingTime0[SIZE][SIZE] __attribute__((aligned(64)));
   integer processingTime1[SIZE][SIZE] __attribute__((aligned(64))) = {0};
 
-  for (integer j = 0; j < J; j++)
-    for (integer m = 0; m < M; m++)
-      processingTime0[m][j] = rand() % 64;
+  if (instance_ID == -1) {
+    for (integer j = 0; j < J; j++)
+      for (integer m = 0; m < M; m++)
+        processingTime0[m][j] = rand() % 64;
+  }
+
+  if (instance_ID != 1) {
+    for (int j = 0; j < M; j++)
+      for (int i = 0; i < J; i++)
+        *(_instance.data) >> processingTime0[j][i];
+  }
 
   for (integer j = M - 1; j < J + (M - 1); j++) {
     for (integer m = 1; m < M1; m++) {
@@ -137,21 +170,29 @@ int main(int argc, char **argv) {
   //--- LOCAL SEARCH ---
   integer min_j1;
   integer min_j2;
-  for (int i = 0; i < numberIterations; i++) {
-    min_j1 = -1;
-    min_j2 = -1;
-    auto cost = new_local_search(processingTime1, min_j1, min_j2);
-    printf("cost = %d j1 = %d j2=%d\n", cost, min_j1 - (M - 1),
-           min_j2 - (M - 1));
+
+  if (isVectorized == 1) {
+    for (int i = 0; i < numberIterations; i++) {
+      min_j1 = -1;
+      min_j2 = -1;
+      auto cost = new_local_search(processingTime1, min_j1, min_j2);
+      /*printf("cost = %d j1 = %d j2=%d\n", cost, min_j1 - (M - 1),
+        min_j2 - (M - 1));*/
+    }
+  } else if (isVectorized == 0) {
+    for (int i = 0; i < numberIterations; i++) {
+      min_j1 = -1;
+      min_j2 = -1;
+      auto cost =
+          classical_local_search(permutation0, processingTime0, min_j1, min_j2);
+      // printf("cost = %d j1 = %d j2=%d\n", cost, min_j1, min_j2);
+    }
   }
 
-  for (int i = 0; i < numberIterations; i++) {
-    min_j1 = -1;
-    min_j2 = -1;
-    auto cost =
-        classical_local_search(permutation0, processingTime0, min_j1, min_j2);
-    printf("cost = %d j1 = %d j2=%d\n", cost, min_j1, min_j2);
-  }
+  auto end_main = clock();
+  auto elapsed_main = end_main - start_main;
+
+  printf("%d %d %d %ld %ld\n",J,M,instance_ID ,cost_time, elapsed_main);
 
   return 0;
 }

@@ -12,7 +12,10 @@ integer processing_time3[64 * 4] __attribute__((aligned(64)));
 integer classic_cost(integer permutation[SIZE],
                      integer processing_times0[SIZE][SIZE]) {
 
-  integer time[M] = {0};
+  integer time[M];
+
+  for (integer m = 0; m < M; m++)
+    time[m] = 0;
 
   for (integer j = 0; j < J; j++) {
     integer job = permutation[j];
